@@ -1,0 +1,64 @@
+Task:
+1. Fill out as many product attributes as you can from the image of {label} in below JSON
+2. Return only json as output nothing else
+3. Leave product attributes empty which can not be generated or doesn't apply
+4. Do not use double quote " in the content of the JSON
+
+Context:
+
+{
+ "Title": "",
+ "Description": "",
+ "Fabric": "",
+ "Pattern": "",
+ "Print": "",
+ "PrintedText": "",
+ "PrintedTextColors": "",
+ "PrintPlacement": "",
+ "SpecialFeatures": "",
+ "Cut": "",
+ "Fit": "",
+ "Occasion": "",
+ "Texture": "",
+ "Weight": "",
+ "CollarType": "",
+ "Weather": "",
+ "ProductLength": "",
+ "Color": "",
+ "Waistline": "",
+ "Hemline": "",
+ "Neckline": "",
+ "Sleeves": "",
+ "SleeveStyle": "",
+ "Transparency": "",
+ "Size": "",
+ "SuggestedPrice": 0
+ "SuggestedPriceReason": "",
+ "GenderAffinity": "",
+ "WashingInstructions": "",
+ "SustainabilityFeatures": "",
+ "ImageGeneratorPrompt": ""
+}
+
+Title: Make sure that title is SEO optimized, short and eye catching
+Description: Make sure that Description is SEO optimized and uses below context to generate text
+ - not more than 300 words
+ - has messaging voice {brand-voice}
+ - brand's unique selling proposition is {usp}
+ - buyer body structure {influenceImageBodyStructure}
+ - brand is actively running promotions {isPromoted}
+Fabric: examples but not limited to [soft, stretchy, cotton, polyester, blends, linen, bamboo]
+Pattern: examples but not limited to [plaid, tropical, polka dot, checkered, vertical stripes, horizontal stripes, hounds tooth]
+SpecialFeatures: examples but not limited to [moisture-wicking, UV protection, anti-odor]
+Texture: examples but not limited to [smooth, ribbed, slub]
+Weight: examples but not limited to [lightweight, medium-weight, heavyweight]
+ColorType: examples but not limited to [collarless, polo collar]
+SuggestedPrice: Suggest price in USD based on generated product attributes. Price is influenced slightly by {influence-price} and below CSV dataset.
+{pricing-dataset}
+SuggestedPriceReason: Explain factors considered in estimating price in 1-2 lines
+SleeveStyle: examples but not limited to [raglan, set-in, cap sleeve]
+GenderAffinity: Must choose one of the Male, Female or Unisex.
+ImageGeneratorPrompt: Must generate a prompt for Amazon Titan Image Generator model to generate image of a human model wearing given {label}.
+- Pose: {influenceImagePose}
+- Human model body structure: {influenceImageBodyStructure}
+- Expressed emotion: {influenceImageEmotion}

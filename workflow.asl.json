@@ -1,0 +1,95 @@
+{
+  "Comment": "AI-powered product catalog workflow that processes product images through Amazon Rekognition for label detection, then runs parallel branches for product attribution and image generation using Lambda functions",
+  "StartAt": "DetectLabels",
+  "States": {
+    "DetectLabels": {
+      "Type": "Task",
+      "Parameters": {
+        "Features": [
+          "GENERAL_LABELS",
+          "IMAGE_PROPERTIES"
+        ],
+        "Image": {
+          "S3Object": {
+            "Bucket": "${ImageBucketName}",
+            "Name.$": "$.path"
+          }
+        },
+        "MinConfidence": 90,
+        "Settings": {
+          "ImageProperties": {
+            "MaxDominantColors": 3
+          }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:rekognition:detectLabels",
+      "Next": "Parallel",
+      "ResultPath": "$.rekognition"
+    },
+    "Parallel": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "ProductAttribution",
+          "States": {
+            "ProductAttribution": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload": {
+                  "data.$": "$",
+                  "executionId.$": "$$.Execution.Name"
+                },
+        "FunctionName": "${ProductAttributionFnArn}"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 1,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ImageGeneration",
+          "States": {
+            "ImageGeneration": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload.$": "$",
+        "FunctionName": "${ImageGenerationFnArn}"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 1,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "End": true
+            }
+          }
+        }
+      ],
+      "End": true
+    }
+  }
+}
