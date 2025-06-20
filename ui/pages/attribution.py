@@ -24,18 +24,24 @@ c2 = st.container()
 col1, col2 = c2.columns(2)
 
 with col1:
-    input_images = []
     with st.form("Parameters"):
         current_id = str(uuid.uuid4())
         use_case = st.selectbox('Use case', ['Hospitality'], 0)
-        for i in range(1, 6):
-            input_images.append(st.file_uploader(f"Input image {i}", type=["jpg", "jpeg", "png"]))
+        input_images = st.file_uploader(
+            "Upload images (up to 5)", 
+            type=["jpg", "jpeg", "png"], 
+            accept_multiple_files=True,
+            help="Select up to 5 images for attribution analysis"
+        )
 
         submitted = st.form_submit_button("Submit")
         if submitted:
             paths = []
-            for input_image in input_images:
-                if input_image is not None:
+            if input_images:
+                # Limit to maximum 5 files
+                files_to_process = input_images[:5]
+                
+                for i, input_image in enumerate(files_to_process, 1):
                     ext = input_image.name.split(".")[-1]
                     path = f"input/attributions/{current_id}_{i}.{ext}"
                     paths.append(path)
@@ -43,9 +49,12 @@ with col1:
                     s3.put_object(Bucket=bucket, Key=path, Body=img_bytes)
                     st.image(img_bytes, use_container_width=True)
 
-            execution = steps.start_execution(stateMachineArn=state_machine_arn,
-                                              input=json.dumps({"id": current_id, "useCase": use_case, "paths": paths}))
-            st.session_state['current_id'] = current_id
+            if paths:  # Only start execution if we have images to process
+                execution = steps.start_execution(stateMachineArn=state_machine_arn,
+                                                  input=json.dumps({"id": current_id, "useCase": use_case, "paths": paths}))
+                st.session_state['current_id'] = current_id
+            else:
+                st.error("Please upload at least one image before submitting.")
 
 with col2:
     attribution = st.empty()
