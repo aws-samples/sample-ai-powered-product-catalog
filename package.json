@@ -12,13 +12,13 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "aws-cdk": "^2.177.0",
+    "aws-cdk": "^2.201.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.177.0",
-    "@aws-cdk/aws-lambda-python-alpha": "^2.177.0-alpha.0",
+    "aws-cdk-lib": "2.201.0",
+    "@aws-cdk/aws-lambda-python-alpha": "^2.201.0-alpha.0",
     "constructs": "^10.4.2",
     "cdk-nag": "^2.35.10",
     "source-map-support": "^0.5.21"

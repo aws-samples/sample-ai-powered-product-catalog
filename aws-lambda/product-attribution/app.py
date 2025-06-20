@@ -79,10 +79,13 @@ def lambda_handler(event, context):
     )
 
     # Prepare the content for Converse API
+    extension = event["data"]["path"].split(".")[-1]
+    if extension.lower() == "jpg":
+        extension = "jpeg"
     content = [
         {
             "image": {
-                "format": event["data"]["path"].split(".")[-1],
+                "format": extension,
                 "source": {
                     "bytes": base64.b64decode(read_as_base64(bucket_name, event["data"]["path"]))
                 }

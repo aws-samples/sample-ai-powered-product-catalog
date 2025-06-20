@@ -98,6 +98,7 @@ The EC2 instance is deployed in a private isolated subnet without internet acces
    # Get the EC2 instance ID from the AWS Console or CLI
    INSTANCE_ID=$(aws ec2 describe-instances \
      --filters "Name=tag:aws:cloudformation:stack-name,Values=AutomatedProductCatalogStack" \
+               "Name=instance-state-name,Values=running" \
      --query 'Reservations[0].Instances[0].InstanceId' \
      --output text)
    

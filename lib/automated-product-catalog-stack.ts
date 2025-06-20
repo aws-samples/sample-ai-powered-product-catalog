@@ -4,7 +4,7 @@ import {Construct} from 'constructs';
 import {DefinitionBody, LogLevel, StateMachine} from "aws-cdk-lib/aws-stepfunctions";
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {Code, Function, Runtime} from "aws-cdk-lib/aws-lambda";
-import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import {ManagedPolicy, PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {AttributeType, Table, TableEncryption} from "aws-cdk-lib/aws-dynamodb";
 import {DockerImageAsset, Platform} from "aws-cdk-lib/aws-ecr-assets";
 import {GatewayVpcEndpointAwsService, InterfaceVpcEndpointAwsService, SubnetType, Vpc} from "aws-cdk-lib/aws-ec2";
@@ -27,8 +27,8 @@ export class AutomatedProductCatalogStack extends cdk.Stack {
             },
             {
                 id: "AwsSolutions-IAM4",
-                reason: "Using AWS managed policy AWSLambdaBasicExecutionRole which provides minimal permissions for Lambda execution",
-                appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole']
+                reason: "Using AWS managed policies which provides minimal permissions for Lambda execution and EC2 to connect with SSM",
+                appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole', 'Policy::arn:<AWS::Partition>:iam::aws:policy/AmazonSSMManagedInstanceCore']
             },
             {
                 id: "AwsSolutions-IAM5",
@@ -54,7 +54,9 @@ export class AutomatedProductCatalogStack extends cdk.Stack {
         const table = new Table(this, "ProductDrafts", {
             partitionKey: {name: "Id", type: AttributeType.STRING},
             encryption: TableEncryption.AWS_MANAGED,
-            pointInTimeRecovery: true
+            pointInTimeRecoverySpecification: {
+                pointInTimeRecoveryEnabled: true
+            }
         });
 
         const textModelId = "amazon.nova-pro-v1:0";
@@ -248,6 +250,7 @@ export class AutomatedProductCatalogStack extends cdk.Stack {
         const userData = cdk.aws_ec2.UserData.forLinux();
         const dockerImageUri = streamlitDkrImage.imageUri;
         streamlitDkrImage.repository.grantPull(ec2Instance);
+        ec2Instance.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"))
 
 
         userData.addCommands(
