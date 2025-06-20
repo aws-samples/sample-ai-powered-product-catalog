@@ -78,40 +78,42 @@ def lambda_handler(event, context):
         }
     )
 
-    # Prepare the request body
-    request_body = {
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 4000,
-        "messages": [
+    # Prepare the content for Converse API
+    content = [
+        {
+            "image": {
+                "format": event["data"]["path"].split(".")[-1],
+                "source": {
+                    "bytes": base64.b64decode(read_as_base64(bucket_name, event["data"]["path"]))
+                }
+            }
+        },
+        {
+            "text": final_prompt
+        }
+    ]
+
+    # Make the API call using Converse API
+    response = bedrock.converse(
+        modelId=model_id,
+        messages=[
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/jpeg",
-                            "data": read_as_base64(bucket_name, event["data"]["path"])
-                        }
-                    },
-                    {
-                        "type": "text",
-                        "text": final_prompt
-                    }
-                ]
+                "content": content
             }
         ],
-        "temperature": 1
-    }
-
-    # Make the API call
-    response = bedrock.invoke_model(
-        modelId=model_id,
-        body=json.dumps(request_body)
+        inferenceConfig={
+            "maxTokens": 4000,
+            "temperature": 1
+        }
     )
 
-    response_body = json.loads(response['body'].read())
-    completion = response_body['content'][0]['text']
+    # Log token usage
+    if 'usage' in response:
+        usage = response['usage']
+        print(f"Input tokens: {usage.get('inputTokens', 0)}, Output tokens: {usage.get('outputTokens', 0)}")
+
+    completion = response['output']['message']['content'][0]['text']
     print(completion)
 
     attribution = json.loads(completion)

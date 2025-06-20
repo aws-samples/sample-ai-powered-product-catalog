@@ -49,7 +49,7 @@ def lambda_handler(event, context):
     for i in event["data"]["paths"]:
         content.append({
             "image": {
-                "format": "jpeg",
+                "format": i.split(".")[-1],
                 "source": {
                     "bytes": base64.b64decode(read_as_base64(bucket_name, i))
                 }
@@ -74,6 +74,11 @@ def lambda_handler(event, context):
             "temperature": 1
         }
     )
+
+    # Log token usage
+    if 'usage' in response:
+        usage = response['usage']
+        print(f"Input tokens: {usage.get('inputTokens', 0)}, Output tokens: {usage.get('outputTokens', 0)}")
 
     completion = response['output']['message']['content'][0]['text']
     print(completion)

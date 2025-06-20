@@ -4,15 +4,31 @@ This sample project demonstrates an AI-powered solution that transforms simple p
 
 ## Architecture Overview
 
-The solution consists of:
+![Architecture Diagram](ui/img/architecture.jpg)
 
-- **Streamlit Web UI**: Interactive interface for uploading product images and configuring generation parameters
-- **AWS Step Functions**: Orchestrates the AI processing workflow
-- **Amazon Bedrock**: Powers text generation (Nova Pro) and image generation (Nova Canvas) for virtual try-on
-- **AWS Lambda**: Handles product attribution and image processing logic
-- **Amazon S3**: Stores input images, generated outputs, and human model images
-- **Amazon DynamoDB**: Persists product draft information
-- **Amazon EC2**: Hosts the Streamlit application in a secure VPC environment
+The architecture diagram illustrates the following processing workflow:
+
+1. **User Interaction**: Users access the Streamlit web application running on EC2 to upload product images and configure generation parameters (gender, pose, body structure, emotion, brand voice, etc.)
+
+2. **Image Upload & Storage**: Product images and optional human model images are uploaded and stored in Amazon S3 buckets for processing
+
+3. **Workflow Orchestration**: AWS Step Functions initiates and orchestrates the AI processing workflow, managing the sequence of operations and error handling
+
+4. **Product Attribution**: The first Lambda function (`product-attribution`) analyzes the uploaded product image using Amazon Bedrock's Nova Pro model to:
+   - Extract product features and attributes
+   - Generate detailed product descriptions
+   - Apply brand voice and pricing influences based on user parameters
+
+5. **Virtual Try-On Generation**: The second Lambda function (`image-try-on`) leverages Amazon Bedrock's Nova Canvas model to:
+   - Generate or use the provided human model image
+   - Apply the product to the human model based on specified parameters (pose, body structure, emotion)
+   - Create realistic virtual try-on images
+
+6. **Data Persistence**: Product information, metadata, and processing status are stored in Amazon DynamoDB for tracking and retrieval
+
+7. **Output Storage**: Generated images (virtual try-on results) and product descriptions are stored back in Amazon S3
+
+8. **Results Display**: Users can view the generated content through the Streamlit interface, accessing both the AI-generated product descriptions and virtual try-on images
 
 ## Features
 
@@ -151,6 +167,17 @@ To avoid ongoing AWS charges, destroy the stack when no longer needed:
 ```bash
 cdk destroy AutomatedProductCatalogStack
 ```
+
+## Costs
+Running this sample for processing 1000 images per month costs about 170$ to 290$ in us-east-1 region.
+- Amazon Bedrock - Amazon Nova Canvas for AI generated human images 3 x 1000 = 3000 x 0.04 = 120$ (This applies only when not using actual huamn model images)
+- Amazon Bedrock - Amazon Nova Canvas for Virtual tryon images 3 x 1000 = 3000 x 0.04 = 120$
+- Amazon Bedrock - Amazon Nova Pro for Attribution 
+- Amazon EC2 36$
+- Amazon DynamoDB 3$
+- AWS Step function 0.5$
+- Amazon S3 1$ (15g storage)
+- AWS Lambda 1$
 
 ## License
 

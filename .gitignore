@@ -3,3 +3,4 @@ node_modules
 **/.venv
 cdk.context.json
 package-lock.json
+*.drawio
