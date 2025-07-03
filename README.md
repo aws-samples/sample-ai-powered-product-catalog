@@ -60,6 +60,8 @@ Before deployment, you must enable the required foundation models in Amazon Bedr
    - **Amazon Nova Pro** (`amazon.nova-pro-v1:0`) - for text generation
    - **Amazon Nova Canvas** (`amazon.nova-canvas-v1:0`) - for image generation
 
+Refer [Amazon Nova Canvas update: Virtual try-on and style options now available](https://aws.amazon.com/blogs/aws/amazon-nova-canvas-update-virtual-try-on-and-style-options-now-available/)
+
 ## Deployment Instructions
 
 ### 1. Clone and Setup
