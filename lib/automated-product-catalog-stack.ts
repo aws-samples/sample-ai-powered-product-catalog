@@ -16,6 +16,8 @@ export class AutomatedProductCatalogStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
+        this.templateOptions.description = "AI-powered product catalog system with automated attribution, virtual try-on, and Streamlit UI using Amazon Bedrock, Step Functions, and Lambda (uksb-7w5sn5f4ec)";
+
         NagSuppressions.addStackSuppressions(this, [
             {
                 id: "AwsSolutions-S1",
