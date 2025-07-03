@@ -58,7 +58,7 @@ Before deploying this solution, ensure you have:
 5. **jq** command-line JSON processor (Optional only for local development)
 6. **AWS Account** to deploy this sample project
 
-### Enable Amazon Bedrock Models
+### Enable Amazon Nova models
 
 Before deployment, you must enable the required foundation models in Amazon Bedrock:
 
