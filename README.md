@@ -2,6 +2,14 @@
 
 This sample project demonstrates an AI-powered solution that transforms simple product photos into rich, detailed product listings using Amazon Bedrock's foundation models. The system automatically generates product descriptions, creates virtual try-on images, and provides comprehensive product attribution.
 
+## Quick Demos
+
+### Product Catalog Demo
+![Product Catalog Demo](demos/quick-demo-product-catalog.gif)
+
+### Attribution Demo
+![Hospitality Attribution Demo](demos/quick-demo-hospitality-attribution.gif)
+
 ## Architecture Overview
 
 ![Architecture Diagram](ui/img/architecture.jpg)
